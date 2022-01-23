@@ -25,7 +25,7 @@
         cidr: "{{PubSub1Cidr}}"
         map_public: no #CHANGE TO YES
         tags:
-          Name: vprofile-pubsub1
+          Name: vprofile_pubsub1
       register: pubsub1_out
 
     - name: Create public subnet 2 Zone 2
@@ -37,7 +37,7 @@
         cidr: "{{PubSub2Cidr}}"
         map_public: no #CHANGE TO YES
         tags:
-          Name: vprofile-pubsub2
+          Name: vprofile_pubsub2
       register: pubsub2_out
 
     - name: Create public subnet 3 Zone 3
@@ -49,7 +49,7 @@
         cidr: "{{PubSub3Cidr}}"
         map_public: no #CHANGE TO YES
         tags:
-          Name: vprofile-pubsub3
+          Name: vprofile_pubsub3
       register: pubsub3_out
 
     - name: Create private subnet 1 in Zone 1
@@ -60,7 +60,7 @@
         state: "{{state}}"
         cidr: "{{PrivSub1Cidr}}"
         tags:
-          Name: vprofile-privsub1
+          Name: vprofile_privsub1
       register: privsub1_out
 
     - name: Create private subnet 2 in Zone 2
@@ -71,7 +71,7 @@
         state: "{{state}}"
         cidr: "{{PrivSub2Cidr}}"
         tags:
-          Name: vprofile-privsub2
+          Name: vprofile_privsub2
       register: privsub2_out
 
     - name: Create private subnet 3 in Zone 3
@@ -82,5 +82,29 @@
         state: "{{state}}"
         cidr: "{{PrivSub3Cidr}}"
         tags:
-          Name: vprofile-privsub3
+          Name: vprofile_privsub3
       register: privsub3_out
+
+    - name: Internet Gateway setup
+      ec2_vpc_igw:
+        vpc_id: "{{vpcout.vpc.id}}"
+        region: "{{region}}"
+        state: "{{state}}"
+        tags:
+          Name: vprofile_IGW
+      register: igw_out
+
+    - name: Public subnet route table setup
+      ec2_vpc_route_table:
+        vpc_id: "{{vpcout.vpc.id}}"
+        region: "{{region}}"
+        subnets:
+          - "{{pubsub1_out.subnet.id}}"
+          - "{{pubsub2_out.subnet.id}}"
+          - "{{pubsub3_out.subnet.id}}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{igw_out.gateway_id}}"
+        tags:
+          Name: vprofile_pubRT
+      register: pubRT_out
