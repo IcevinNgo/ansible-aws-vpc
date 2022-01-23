@@ -109,7 +109,7 @@
           Name: vprofile_pubRT
       register: pubRT_out
 
-#Delete NAT gateway after use so you won't be charged by using the EIP
+#Delete NAT gateway after use so you won't be charged for the EIP
     - name: create new NAT gateway and allocate new EIP if NAT gateway does not exist in the
       ec2_vpc_nat_gateway:
         state: "{{state}}"
@@ -133,3 +133,38 @@
         tags:
           Name: vprofile_privRT
       register: privRT_out
+
+#Print IDs for storing
+    - debug:
+        var: "{{item}}"
+      loop:
+        - vpc_out.vpc.id
+        - pubsub1_out.subnet.id
+        - pubsub2_out.subnet.id
+        - pubsub3_out.subnet.id
+        - privsub1_out.subnet.id
+        - privsub2_out.subnet.id
+        - privsub3out.subnet.id
+        - igw_out.gateway_id
+        - pubRT_out.route_table.id
+        - NATGW_out.nat_gateway_id
+        - privRT_out.route_table.id
+#Store fact cached
+    - set_fact:
+        vpcid: "{{vpc_out.vpc.id}}"
+        pubsub1id: "{{pubsub1_out.subnet.id}}"
+        pubsub2id: "{{pubsub2_out.subnet.id}}"
+        pubsub3id: "{{pubsub3_out.subnet.id}}"
+        privsub1id: "{{privsub1_out.subnet.id}}"
+        privsub2id: "{{privsub2_out.subnet.id}}"
+        privsub3id: "{{privsub3out.subnet.id}}"
+        igwid: "{{igw_out.gateway_id}}"
+        pubRTid: "{{pubRT_out.route_table.id}}"
+        NATGWid: "{{NATGW_out.nat_gateway_id}}"
+        privRTid: "{{privRT_out.route_table.id}}"
+        cacheable: yes
+
+    - name: Create variables file for vpc output
+      copy:
+        content: "pcid: {{vpc_out.vpc.id}}\npubsub1id: {{pubsub1_out.subnet.id}}\npubsub2id: {{pubsub2_out.subnet.id}}\npubsub3id: {{pubsub3_out.subnet.id}}\nprivsub1id: {{privsub1_out.subnet.id}}\nprivsub2id: {{privsub2_out.subnet.id}}\nprivsub3id: {{privsub3out.subnet.id}}\nigwid: {{igw_out.gateway_id}}\npubRTid: {{pubRT_out.route_table.id}}\nNATGWid: {{NATGW_out.nat_gateway_id}}\nprivRTid: {{privRT_out.route_table.id}}"
+        dest: vars/output_vars
