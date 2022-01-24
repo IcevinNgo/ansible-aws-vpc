@@ -157,7 +157,7 @@
         pubsub3id: "{{pubsub3_out.subnet.id}}"
         privsub1id: "{{privsub1_out.subnet.id}}"
         privsub2id: "{{privsub2_out.subnet.id}}"
-        privsub3id: "{{privsub3out.subnet.id}}"
+        privsub3id: "{{privsub3_out.subnet.id}}"
         igwid: "{{igw_out.gateway_id}}"
         pubRTid: "{{pubRT_out.route_table.id}}"
         NATGWid: "{{NATGW_out.nat_gateway_id}}"
