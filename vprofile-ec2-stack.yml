@@ -173,4 +173,24 @@
       register: db01_out
 
     - debug:
-        var: db01_out
+        var: db01_out.tagged_instances[0].id
+
+    - name: Create ELB
+        delegate_to: localhost
+        elb_classic_lb:
+          name: "vprofile-elb"
+          region: {{region}}
+          state: {{state}}
+          instance_ids:
+            - {{web01_out.tagged_instances[0].id}}
+          purge_instance_ids: true #remove instances not defined in list above
+          security_group: {{vproELBSG_out.group_id}}
+          subnets:
+            - {{pubsub1id}}
+            - {{pubsub2id}}
+            - {{pubsub3id}}
+          listeners:
+            - protocol: http #Options are http, https, ssl, tcp
+              load_balancer_port: 80
+              instance_port: 80
+        register: vprofile-elb_out
