@@ -3,7 +3,7 @@
   connection: local
   become: yes
   tasks:
-    - name: Install jdk, magen, git
+    - name: Install jdk, maven, git
       apt:
         name: {{item}}
         state: present
